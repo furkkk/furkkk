@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tech Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --bg-dark: #000;
+      --bg-light: #fff;
+      --text-dark: #000;
+      --text-light: #fff;
+      --neon: #00ffff;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      color: var(--text-light);
+      background: var(--bg-dark);
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .light-mode {
+      background: var(--bg-light);
+      color: var(--text-dark);
+    }
+
+    canvas.matrix-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .container,
+    .dashboard {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 40px;
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.25);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 8px;
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    button {
+      padding: 10px 18px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .camera-btn {
+      background: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet);
+      color: white;
+      font-weight: bold;
+      animation: glow 1.5s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 10px #0ff; }
+      to { box-shadow: 0 0 25px #0ff; }
+    }
+
+    .dashboard {
+      display: none;
+      position: relative;
+    }
+
+    .top-bar {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .profile-menu-btn {
+      background: var(--neon);
+      color: black;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .dark-toggle {
+      background: #333;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .profile-panel {
+      position: absolute;
+      top: 60px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 12px;
+      display: none;
+      box-shadow: 0 0 15px #00ffff99;
+    }
+
+    .profile-panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .logout-btn {
+      margin-top: 10px;
+      background: red;
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+    }
+
+    #cameraStream {
+      margin-top: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #00ffffaa;
+      max-width: 90%;
+    }
+
+    #errorPopup {
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 0, 0, 0.9);
+      color: white;
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      z-index: 1000;
+      display: none;
+      animation: slideIn 0.5s ease;
+    }
+
+    #errorPopup .close-btn {
+      margin-left: 10px;
+      color: white;
+      cursor: pointer;
+    }
+
+    @keyframes slideIn {
+      from { transform: translate(-50%, -50px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .footer, .login-footer {
+      position: absolute;
+      bottom: 20px;
+      font-size: 12px;
+      text-align: center;
+      width: 100%;
+      color: #aaa;
+      animation: fadeIn 2s ease;
+    }
+
+    .instagram-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      border-radius: 30px;
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 15px;
+      box-shadow: 0 0 10px #ff0080, 0 0 20px #ff0080, 0 0 30px #ff0080;
+      animation: glowPulse 1.5s infinite alternate;
+    }
+
+    .instagram-btn i {
+      margin-right: 8px;
+    }
+
+    @keyframes glowPulse {
+      from { box-shadow: 0 0 10px #ff0080; }
+      to { box-shadow: 0 0 25px #ff0080; }
+    }
+  </style>
+</head>
+<body>
+<canvas class="matrix-bg"></canvas>
+<div class="container" id="loginPage">
+  <div class="login-box">
+    <h2>Tech Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <div><input type="checkbox" id="verifyBot" /> I'm not a robot</div>
+    <button onclick="login()">Login</button>
+
+    <!-- Instagram Button Added Here -->
+    <a href="https://www.instagram.com/furkaaannn_.0?igsh=dmF1MTQyZDR5cmRw" target="_blank" class="instagram-btn">
+      <i class="fab fa-instagram"></i> Follow on Instagram
+    </a>
+  </div>
+  <div class="login-footer">
+    <p>Directed by Furkaan</p>
+  </div>
+</div>
+
+<div class="dashboard" id="dashboardPage">
+  <div class="top-bar">
+    <div class="dark-toggle" onclick="toggleDarkMode()">Toggle Mode</div>
+    <div class="profile-menu-btn" onclick="toggleProfilePanel()">Account</div>
+    <div class="profile-panel" id="profilePanel">
+      <p><strong>Username:</strong> <span id="savedUsername"></span></p>
+      <p><strong>Password:</strong> <span id="savedPassword"></span></p>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+  <h1>Welcome, <span id="displayUsername"></span>!</h1>
+  <button class="camera-btn" onclick="capturePhoto()">Capture</button>
+  <video id="cameraStream" autoplay playsinline></video>
+  <div class="footer">
+    <p>&copy; 2025</p>
+    <p>Directed by Furkaan</p>
+  </div>
+</div>
+
+<div id="errorPopup">
+  <span id="errorMessage">Error</span>
+  <span class="close-btn" onclick="hideErrorPopup()">&times;</span>
+</div>
+
+<script>
+  const canvas = document.querySelector(".matrix-bg");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const letters = "01";
+  const fontSize = 14;
+  const columns = canvas.width / fontSize;
+  const drops = Array.from({ length: columns }).fill(1);
+
+  function drawMatrix() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#0f0";
+    ctx.font = fontSize + "px monospace";
+    for (let i = 0; i < drops.length; i++) {
+      const text = letters.charAt(Math.floor(Math.random() * letters.length));
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }
+  setInterval(drawMatrix, 40);
+
+  const users = [
+    { username: "furkaan", password: "123123" },
+    { username: "admin", password: "admin123" }
+  ];
+
+  function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const verify = document.getElementById("verifyBot").checked;
+
+    if (!username || !password) return showErrorPopup("Please fill in all fields.");
+    if (!verify) return showErrorPopup("Please verify you're not a robot.");
+
+    const user = users.find(u => u.username === username && u.password === password);
+    if (user) {
+      document.getElementById("loginPage").style.display = "none";
+      document.getElementById("dashboardPage").style.display = "flex";
+      document.getElementById("displayUsername").innerText = user.username;
+      document.getElementById("savedUsername").innerText = user.username;
+      document.getElementById("savedPassword").innerText = user.password;
+      startCamera();
+    } else {
+      showErrorPopup("Invalid username or password.");
+    }
+  }
+
+  function showErrorPopup(message) {
+    const popup = document.getElementById("errorPopup");
+    document.getElementById("errorMessage").innerText = message;
+    popup.style.display = "block";
+  }
+
+  function hideErrorPopup() {
+    document.getElementById("errorPopup").style.display = "none";
+  }
+
+  function logout() {
+    location.reload();
+  }
+
+  function toggleProfilePanel() {
+    document.getElementById("profilePanel").classList.toggle("active");
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("light-mode");
+  }
+
+  let stream;
+  function startCamera() {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(mediaStream => {
+        stream = mediaStream;
+        const video = document.getElementById("cameraStream");
+        video.srcObject = stream;
+      })
+      .catch(() => alert("Camera access denied or unavailable."));
+  }
+
+  function capturePhoto() {
+    const video = document.getElementById("cameraStream");
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+    const link = document.createElement("a");
+    link.download = "photo.png";
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+</script>
+</body>
+</html>
